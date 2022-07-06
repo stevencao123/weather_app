@@ -1,23 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, Text, TouchableHighlight, Image, View, ImageBackground, TextInput } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'
+import { StyleSheet, Text, ActivityIndicator, Image, View, ImageBackground, TextInput } from 'react-native';
 import axios from 'axios';
-
-const Display_weather_day = ({data}) => {
-  console.log(data.name)
-  return (
-    <View>
-      <Text>{data.name}</Text>
-    </View>
-  );
-};
 
 export default function App() {
 
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [display, setDisplay] = useState(false);
 
   const api = {
     key: 'ed5eb972e49ba5f4f6f65fe0304879e8',
@@ -26,6 +17,7 @@ export default function App() {
 
   const fetchDataHandler = useCallback(() => {
     setLoading(true);
+    setDisplay(true);
     setInput('');
     axios({
       method: 'GET',
@@ -59,7 +51,20 @@ export default function App() {
         </View>
 
         <View style={styles.main}>
-          {data && (<Display_weather_day data={data} />)}
+          {loading && (
+            <View>
+              <ActivityIndicator size={'large'} color={'#fff'} />
+            </View>
+          )}
+          {!loading && display && (
+            <View style={styles.weather_display}>
+              <Text style={styles.title}>{`${data?.name}, ${data?.sys?.country}`}</Text>
+              <Image style={styles.image} source={{uri: `http://openweathermap.org/img/wn/${data?.weather?.[0].icon}@2x.png`}} />
+              <Text style={styles.text}>{new Date().toLocaleString(data?.main?.temp)}</Text>
+              <Text style={styles.text}>{`${Math.round(data?.main?.temp,)} °C`}</Text>
+              <Text style={styles.text}>{`Min ${Math.round(data?.main?.temp_min,)} °C / Max ${Math.round(data?.main?.temp_max)} °C`}</Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.footer}>
@@ -99,17 +104,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 0, 0, 0.2)',
     alignContent:'center',
     justifyContent: 'center',
+    textAlign: 'center',
+    flexDirection: 'column',
   },
 
   weather_body: {
     flex: 0.3,
-  },
-
-  scroll: {
-    flex: 0.8,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 
   textInput: {
@@ -119,6 +119,26 @@ const styles = StyleSheet.create({
     fontSize: 20,
     borderRadius: 16,
     paddingLeft: 10,
+  },
+
+  title: {
+    color: '#fff',
+    fontSize: 40,
+    fontWeight: 'bold',
+  },
+
+  text: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+
+  image: {
+    alignSelf:'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    height:50,
+    width: 50,
   },
 
 });
