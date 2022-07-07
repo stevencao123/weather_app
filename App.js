@@ -9,6 +9,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [display, setDisplay] = useState(false);
+  const [bgImage, setBg] = useState('clouds');
 
   const api = {
     key: 'ed5eb972e49ba5f4f6f65fe0304879e8',
@@ -26,6 +27,27 @@ export default function App() {
       .then(res => {
         console.log(res.data);
         setData(res.data);
+        console.log(res.data?.weather?.[0].main)
+        switch(res.data?.weather?.[0].main){
+          case 'Clear':
+            setBg('sunny');
+            console.log('sunny')
+            break;
+          case 'Snow':
+            setBg('snow');
+            break;
+          case 'Rain':
+            setBg('rain');
+            break;
+          case 'Drizzle':
+            setBg('drizzle');
+            break;
+          case 'Thunderstorm':
+            setBg('thunder');
+            break;
+          default:
+            setBg('clouds');
+        }
       })
       .catch(err => {
         console.dir(err);
@@ -38,7 +60,7 @@ export default function App() {
   return (
     <View style={styles.container}>
 
-      <ImageBackground source={ require('./assets/background.jpg') } resizeMode='cover' style={styles.container}>
+      <ImageBackground source={ require(`./assets/${bgImage}.jpg`) } resizeMode='cover' style={styles.container}>
 
         <View style={styles.navbar}>
           <TextInput 
@@ -51,8 +73,13 @@ export default function App() {
         </View>
 
         <View style={styles.main}>
+          {!display && (
+            <View style={styles.weather_display}>
+              <Text style={styles.title}>Welcome</Text>
+            </View>
+          )}
           {loading && (
-            <View>
+            <View style={styles.weather_display}>
               <ActivityIndicator size={'large'} color={'#fff'} />
             </View>
           )}
@@ -84,7 +111,7 @@ const styles = StyleSheet.create({
 
   navbar: {
     flex: 0.1,
-    backgroundColor: 'rgba(0, 255, 0, 0.2)',
+    //backgroundColor: 'rgba(0, 255, 0, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -96,12 +123,12 @@ const styles = StyleSheet.create({
 
   footer: {
     flex:0.1,
-    backgroundColor: 'rgba(0, 0, 255, 0.2)',
+    //backgroundColor: 'rgba(0, 0, 255, 0.2)',
   },
 
   weather_display: {
     flex: 1,
-    backgroundColor: 'rgba(255, 0, 0, 0.2)',
+    //backgroundColor: 'rgba(255, 0, 0, 0.2)',
     alignContent:'center',
     justifyContent: 'center',
     textAlign: 'center',
@@ -125,12 +152,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 40,
     fontWeight: 'bold',
+    textShadowColor:'#000',
+    textShadowOffset:{width: 5, height: 5},
+    textShadowRadius:10,
   },
 
   text: {
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
+    textShadowColor:'#000',
+    textShadowOffset:{width: 5, height: 5},
+    textShadowRadius:10,
   },
 
   image: {
